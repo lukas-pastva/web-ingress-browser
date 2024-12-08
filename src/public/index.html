@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Ingress Routes</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+    <!-- Inline styles for the page -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow: auto; /* Updated from 'hidden' to 'auto' */
+            position: relative;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2em;
+            z-index: 1;
+            position: relative;
+        }
+
+        #ingressTable {
+            background-color: white;
+            color: #2c3e50;
+            z-index: 1;
+            position: relative;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<h1 id="domainName">Ingress browser</h1>
+
+<table id="ingressTable" class="display">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Namespace</th>
+        <th>Host</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(document).ready(function() {
+        $("#domainName").text(window.location.hostname);
+
+        // Fetch data from the Node.js server
+        $.getJSON("/ingresses.json", function(data) {
+            const formattedData = data.map(item => {
+                return {
+                    ...item,
+                    host: `<a href="https://${item.host}${item.path}" target="_blank">${item.host}${item.path}</a>`
+                };
+            });
+            $("#ingressTable").DataTable({
+                width: '80%',
+                data: formattedData,
+                columns: [
+                    { data: 'name' },
+                    { data: 'namespace' },
+                    { data: 'host' }
+                ],
+                order: [[0, 'asc']],
+                pageLength: 50
+            });
+        });
+    });
+
+    // Three.js code for spinning cubes
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        let renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Creating multiple cubes
+        for (let i = 0; i < 50; i++) {
+            let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);  // making the cubes smaller
+            let material = new THREE.MeshBasicMaterial({ color: 0x808080 + Math.random() * 0x7F7F7F });  // shades of grey
+            let cube = new THREE.Mesh(geometry, material);
+            cube.position.x = (Math.random() - 0.5) * 10;
+            cube.position.y = (Math.random() - 0.5) * 10;
+            cube.position.z = (Math.random() - 0.5) * 10;
+            scene.add(cube);
+        }
+
+        camera.position.z = 5;
+
+        let animate = function() {
+            requestAnimationFrame(animate);
+
+            // Rotating each object in the scene
+            scene.traverse((object) => {
+                if (object.isMesh) {
+                    object.rotation.x += 0.01;
+                    object.rotation.y += 0.01;
+                }
+            });
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
