@@ -10,9 +10,13 @@
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <!-- DataTables RowGroup CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.2.0/css/rowGroup.dataTables.min.css">
 
     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- DataTables RowGroup JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.2.0/js/dataTables.rowGroup.min.js"></script>
 
     <!-- Inline styles for the page -->
     <style>
@@ -29,6 +33,7 @@
             margin-bottom: 2em;
             z-index: 1;
             position: relative;
+            cursor: pointer; /* Indicate that the header can be interacted with */
         }
 
         #ingressTable {
@@ -46,11 +51,21 @@
             left: 0;
             opacity: 0.5;
         }
+
+        /* Styles for collapsed groups */
+        tr.group.collapsed + tr.dtrg-group {
+            display: none;
+        }
+
+        /* Cursor change for group headers */
+        tr.group {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-<h1 id="domainName">Ingress browser</h1>
+<h1 id="domainName">Ingress Browser</h1>
 
 <table id="ingressTable" class="display">
     <thead>
@@ -75,7 +90,9 @@
                     host: `<a href="https://${item.host}${item.path}" target="_blank">${item.host}${item.path}</a>`
                 };
             });
-            $("#ingressTable").DataTable({
+
+            // Initialize DataTable with RowGroup
+            var table = $("#ingressTable").DataTable({
                 width: '80%',
                 data: formattedData,
                 columns: [
@@ -83,56 +100,105 @@
                     { data: 'namespace' },
                     { data: 'host' }
                 ],
-                order: [[0, 'asc']],
-                pageLength: 50
+                order: [[1, 'asc'], [0, 'asc']], // Order by Namespace then Name
+                pageLength: 500, // Set page length to 500
+                paging: true, // Enable paging
+                rowGroup: {
+                    dataSrc: 'namespace',
+                    startRender: function ( rows, group ) {
+                        // Add a unique identifier for each group
+                        return $('<tr/>')
+                            .append('<td colspan="3"><strong>' + group + ' (' + rows.count() + ')</strong></td>')
+                            .attr('data-group', group)
+                            .addClass('group collapsed');
+                    }
+                }
+            });
+
+            // Collapse all groups by default
+            $('tr.group').each(function() {
+                var groupName = $(this).data('group');
+                // Hide rows belonging to this group
+                table.rows({ search: 'applied' }).every(function(rowIdx, tableLoop, rowLoop){
+                    var data = this.data();
+                    if(data.namespace === groupName){
+                        $(this.node()).hide();
+                    }
+                });
+            });
+
+            // Toggle group collapse on header click
+            $('#ingressTable tbody').on('click', 'tr.group', function () {
+                var groupName = $(this).data('group');
+                var isCollapsed = $(this).hasClass('collapsed');
+
+                if(isCollapsed){
+                    // Expand: Show rows
+                    table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                        var data = this.data();
+                        if(data.namespace === groupName){
+                            $(this.node()).show();
+                        }
+                    });
+                    $(this).removeClass('collapsed');
+                } else {
+                    // Collapse: Hide rows
+                    table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                        var data = this.data();
+                        if(data.namespace === groupName){
+                            $(this.node()).hide();
+                        }
+                    });
+                    $(this).addClass('collapsed');
+                }
             });
         });
     });
 
     // Three.js code for spinning cubes
-        let scene = new THREE.Scene();
-        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        let renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+    let renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-        // Creating multiple cubes
-        for (let i = 0; i < 50; i++) {
-            let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);  // making the cubes smaller
-            let material = new THREE.MeshBasicMaterial({ color: 0x808080 + Math.random() * 0x7F7F7F });  // shades of grey
-            let cube = new THREE.Mesh(geometry, material);
-            cube.position.x = (Math.random() - 0.5) * 10;
-            cube.position.y = (Math.random() - 0.5) * 10;
-            cube.position.z = (Math.random() - 0.5) * 10;
-            scene.add(cube);
-        }
+    // Creating multiple cubes
+    for (let i = 0; i < 50; i++) {
+        let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);  // making the cubes smaller
+        let material = new THREE.MeshBasicMaterial({ color: 0x808080 + Math.random() * 0x7F7F7F });  // shades of grey
+        let cube = new THREE.Mesh(geometry, material);
+        cube.position.x = (Math.random() - 0.5) * 10;
+        cube.position.y = (Math.random() - 0.5) * 10;
+        cube.position.z = (Math.random() - 0.5) * 10;
+        scene.add(cube);
+    }
 
-        camera.position.z = 5;
+    camera.position.z = 5;
 
-        let animate = function() {
-            requestAnimationFrame(animate);
+    let animate = function() {
+        requestAnimationFrame(animate);
 
-            // Rotating each object in the scene
-            scene.traverse((object) => {
-                if (object.isMesh) {
-                    object.rotation.x += 0.01;
-                    object.rotation.y += 0.01;
-                }
-            });
-
-            renderer.render(scene, camera);
-        };
-
-        animate();
-
-        window.addEventListener('resize', () => {
-            let width = window.innerWidth;
-            let height = window.innerHeight;
-            renderer.setSize(width, height);
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
+        // Rotating each object in the scene
+        scene.traverse((object) => {
+            if (object.isMesh) {
+                object.rotation.x += 0.01;
+                object.rotation.y += 0.01;
+            }
         });
-    </script>
+
+        renderer.render(scene, camera);
+    };
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    });
+</script>
 </body>
 </html>
