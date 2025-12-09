@@ -22,8 +22,6 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <!-- Three.js (required for the background cubes below) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- Inline styles for the page -->
     <style>
@@ -96,12 +94,7 @@
             margin: 0 auto;
         }
 
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0.5;
-        }
+        /* previously used for Three.js background; removed */
 
         /* Styles for collapsed groups */
         tr.group.collapsed + tr.dtrg-group {
@@ -449,50 +442,7 @@
         });
     });
 
-    // Three.js code for spinning cubes
-    let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-    let renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // Creating multiple cubes
-    for (let i = 0; i < 50; i++) {
-        let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);  // making the cubes smaller
-        let material = new THREE.MeshBasicMaterial({ color: 0x808080 + Math.random() * 0x7F7F7F });  // shades of grey
-        let cube = new THREE.Mesh(geometry, material);
-        cube.position.x = (Math.random() - 0.5) * 10;
-        cube.position.y = (Math.random() - 0.5) * 10;
-        cube.position.z = (Math.random() - 0.5) * 10;
-        scene.add(cube);
-    }
-
-    camera.position.z = 5;
-
-    let animate = function() {
-        requestAnimationFrame(animate);
-
-        // Rotating each object in the scene
-        scene.traverse((object) => {
-            if (object.isMesh) {
-                object.rotation.x += 0.01;
-                object.rotation.y += 0.01;
-            }
-        });
-
-        renderer.render(scene, camera);
-    };
-
-    animate();
-
-    window.addEventListener('resize', () => {
-        let width = window.innerWidth;
-        let height = window.innerHeight;
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-    });
+    // Three.js background removed per request
 </script>
 </body>
 </html>
