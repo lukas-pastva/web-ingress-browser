@@ -236,11 +236,50 @@
     })();
 
     // Helpers to render Markdown + Mermaid safely into the description
+    // Debug helpers for description + mermaid
+    window.__lastDescriptionDebug = null;
+    window.debugDescription = function(){
+        if (!window.__lastDescriptionDebug) {
+            console.warn('No description has been rendered yet.');
+            return null;
+        }
+        var dbg = window.__lastDescriptionDebug;
+        try {
+            console.group('Description Debug');
+            console.log('Raw Markdown:', dbg.raw);
+            console.log('Normalized Markdown:', dbg.normalized);
+            console.log('Mermaid blocks (from Markdown):', dbg.mermaidBlocksMarkdown);
+            console.log('Generated HTML (pre-sanitize):', dbg.html);
+            console.log('Sanitized HTML (inserted):', dbg.safeHtml);
+            console.log('Mermaid blocks (from DOM):', dbg.mermaidBlocksDom);
+            console.log('Mermaid nodes count:', (dbg.mermaidBlocksDom || []).length);
+            console.log('Mermaid version:', dbg.mermaidVersion || '(unknown)');
+            if (dbg.mermaidRenderError) console.error('Mermaid render error:', dbg.mermaidRenderError);
+            console.groupEnd();
+        } catch(e) {
+            console.log(dbg);
+        }
+        return dbg;
+    };
+
+    function extractMermaidBlocksFromMarkdown(md){
+        var blocks = [];
+        try {
+            var re = /```mermaid\s*([\s\S]*?)```/gi;
+            var m;
+            while ((m = re.exec(md)) !== null) {
+                blocks.push((m[1] || '').trim());
+            }
+        } catch(e) { /* ignore */ }
+        return blocks;
+    }
+
     function renderDescription(markdownText) {
         try {
             if (!markdownText) return;
             // Normalize newlines to help Markdown/Mermaid parsing
             if (typeof markdownText === 'string') {
+                var __raw = String(markdownText);
                 markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
             }
             // Configure marked with custom renderer for mermaid blocks
@@ -261,6 +300,20 @@
                     ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true, svg: true } })
                     : html;
                 $('#descContent').html(safeHtml);
+                // Capture debug info after HTML insertion
+                var domBlocks = Array.prototype.map.call(
+                    document.querySelectorAll('#descContent .mermaid'),
+                    function(n){ return n.textContent; }
+                );
+                window.__lastDescriptionDebug = {
+                    raw: __raw || markdownText,
+                    normalized: markdownText,
+                    html: html,
+                    safeHtml: safeHtml,
+                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
+                    mermaidBlocksDom: domBlocks,
+                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
+                };
             } else {
                 // Fallback: basic escaping and newline handling
                 var escapeHtml = function(s){
@@ -271,7 +324,17 @@
                         .replace(/"/g, '&quot;')
                         .replace(/'/g, '&#039;');
                 };
-                $('#descContent').html(escapeHtml(markdownText).replace(/\n/g, '<br>'));
+                var fallbackHtml = escapeHtml(markdownText).replace(/\n/g, '<br>');
+                $('#descContent').html(fallbackHtml);
+                window.__lastDescriptionDebug = {
+                    raw: __raw || markdownText,
+                    normalized: markdownText,
+                    html: fallbackHtml,
+                    safeHtml: fallbackHtml,
+                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
+                    mermaidBlocksDom: [],
+                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
+                };
             }
 
             // Render mermaid diagrams if library is available
@@ -287,7 +350,12 @@
                         if (typeof mermaid.run === 'function') {
                             mermaid.run({ nodes: mermaidNodes })
                                 .then(function(){ setupDescriptionToggle(); })
-                                .catch(function(){ setupDescriptionToggle(); });
+                                .catch(function(err){
+                                    if (window.__lastDescriptionDebug) {
+                                        window.__lastDescriptionDebug.mermaidRenderError = (err && (err.message || String(err))) || 'Unknown error';
+                                    }
+                                    setupDescriptionToggle();
+                                });
                             return; // toggle will be handled after render
                         } else if (typeof mermaid.init === 'function') {
                             mermaid.init(undefined, mermaidNodes);
