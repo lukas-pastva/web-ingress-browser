@@ -163,6 +163,43 @@ Configuration and Environment Variables
 
 *   **`FILTER_PATTERN`**: Optional. If set, the `list_ingress.sh` script filters ingresses by name using a regex-like pattern.
 
+*   **`PAGE_TITLE`**: Optional. If set, the UI uses this value for the browser tab title and the main page header. Example:
+
+    ```yaml
+    env:
+      - name: PAGE_TITLE
+        value: "My Ingress Browser"
+    ```
+
+    The value is exposed via `GET /config.json` and applied by the frontend on load.
+
+*   **`PAGE_DESCRIPTION`**: Optional. Multiline text shown under the title. Supports Markdown, including Mermaid diagrams (use fenced code blocks with `mermaid`). The UI collapses long descriptions with a “Show more/Show less” toggle.
+
+    Example:
+
+    ```yaml
+    env:
+      - name: PAGE_DESCRIPTION
+        value: |
+          Welcome to our ingress browser.
+          
+          ## Quick Tips
+          - Use the search bar to filter
+          - Click a host to open it
+          
+          ### Architecture
+          ```mermaid
+          graph TD
+            A[K8s API] -->|ingresses| B[list_ingress.sh]
+            B -->|/tmp/ingresses.json| C[Express]
+            C -->|/ingresses.json| D[Web UI]
+          ```
+    ```
+
+    Notes:
+    - Markdown is parsed client-side; diagrams render from fenced blocks labeled `mermaid`.
+    - If CDNs are blocked in your environment, vendor `marked`, `dompurify`, and `mermaid` or serve them locally.
+
 * * *
 
 License
