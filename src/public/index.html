@@ -22,6 +22,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Three.js (required for the background cubes below) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- Inline styles for the page -->
     <style>
@@ -244,6 +246,10 @@
     function renderDescription(markdownText) {
         try {
             if (!markdownText) return;
+            // Normalize newlines to help Markdown/Mermaid parsing
+            if (typeof markdownText === 'string') {
+                markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
+            }
             // Configure marked with custom renderer for mermaid blocks
             if (window.marked) {
                 const renderer = new marked.Renderer();
@@ -279,17 +285,20 @@
             if (window.mermaid) {
                 try {
                     if (!renderDescription._mermaidInit) {
-                        mermaid.initialize({ startOnLoad: false });
+                        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
                         renderDescription._mermaidInit = true;
                     }
                     // Prefer run (v10+), fallback to init
-                    if (typeof mermaid.run === 'function') {
-                        mermaid.run({ nodes: document.querySelectorAll('#descContent .mermaid') }).then(function(){
-                            setupDescriptionToggle();
-                        }).catch(function(){ setupDescriptionToggle(); });
-                        return; // toggle will be handled after render
-                    } else if (typeof mermaid.init === 'function') {
-                        mermaid.init(undefined, '#descContent .mermaid');
+                    var mermaidNodes = document.querySelectorAll('#descContent .mermaid');
+                    if (mermaidNodes && mermaidNodes.length) {
+                        if (typeof mermaid.run === 'function') {
+                            mermaid.run({ nodes: mermaidNodes })
+                                .then(function(){ setupDescriptionToggle(); })
+                                .catch(function(){ setupDescriptionToggle(); });
+                            return; // toggle will be handled after render
+                        } else if (typeof mermaid.init === 'function') {
+                            mermaid.init(undefined, mermaidNodes);
+                        }
                     }
                 } catch (e) { /* ignore mermaid errors */ }
             }
