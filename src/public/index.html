@@ -436,14 +436,37 @@
                     });
                     if (mermaidNodes && mermaidNodes.length) {
                         if (typeof mermaid.run === 'function') {
+                            // Store original content for retry
+                            var originalContents = [];
+                            mermaidNodes.forEach(function(node) {
+                                originalContents.push(node.textContent);
+                            });
+
                             mermaid.run({ nodes: mermaidNodes })
                                 .then(function(){
                                     console.log('[DEBUG 9] Mermaid render SUCCESS');
                                     setupDescriptionToggle();
                                 })
                                 .catch(function(err){
-                                    console.error('Mermaid error:', err);
-                                    setupDescriptionToggle();
+                                    console.error('Mermaid error, retrying without edge labels:', err);
+                                    // Retry with simplified diagram (remove edge labels)
+                                    mermaidNodes.forEach(function(node, i) {
+                                        var simplified = originalContents[i]
+                                            .replace(/-->\|[^|]*\|/g, '-->')
+                                            .replace(/---\|[^|]*\|/g, '---');
+                                        node.textContent = simplified;
+                                        node.removeAttribute('data-processed');
+                                        console.log('[DEBUG 10] Simplified code:', simplified);
+                                    });
+                                    mermaid.run({ nodes: mermaidNodes })
+                                        .then(function(){
+                                            console.log('[DEBUG 11] Mermaid retry SUCCESS');
+                                            setupDescriptionToggle();
+                                        })
+                                        .catch(function(err2){
+                                            console.error('Mermaid retry also failed:', err2);
+                                            setupDescriptionToggle();
+                                        });
                                 });
                             return;
                         } else if (typeof mermaid.init === 'function') {
