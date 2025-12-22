@@ -396,7 +396,9 @@
                         lang = (infostring || '').trim().toLowerCase();
                     }
                     if (lang === 'mermaid') {
-                        return '<div class="mermaid">' + code + '</div>';
+                        // Clean up edge labels: remove quotes that cause rendering issues
+                        var cleanCode = code.replace(/\|"([^"]+)"\|/g, '|$1|');
+                        return '<div class="mermaid">' + cleanCode + '</div>';
                     }
                     return origCode(codeOrObj, infostring, escaped);
                 };
