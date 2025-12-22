@@ -398,8 +398,8 @@
                     if (lang === 'mermaid') {
                         // Clean up edge labels: remove quotes that cause rendering issues
                         var cleanCode = code.replace(/\|"([^"]+)"\|/g, '|$1|');
-                        // Convert TD to LR to avoid edge label positioning bugs
-                        cleanCode = cleanCode.replace(/^(\s*graph\s+)TD/m, '$1LR');
+                        // Convert graph to flowchart (newer syntax with better rendering)
+                        cleanCode = cleanCode.replace(/^(\s*)graph(\s+)(TD|LR|TB|BT|RL)/m, '$1flowchart$2$3');
                         return '<div class="mermaid">' + cleanCode + '</div>';
                     }
                     return origCode(codeOrObj, infostring, escaped);
