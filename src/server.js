@@ -8,6 +8,14 @@ const port = 8080;
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
+// Configuration endpoint to expose optional UI settings
+app.get('/config.json', (req, res) => {
+    const title = process.env.PAGE_TITLE || process.env.UI_TITLE || null;
+    const description = process.env.PAGE_DESCRIPTION || process.env.UI_DESCRIPTION || null;
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({ title, description }));
+});
+
 // Function to generate ingresses.json by running the shell script
 function generateIngressesJson(callback) {
     exec('/app/list_ingress.sh', (error, stdout, stderr) => {

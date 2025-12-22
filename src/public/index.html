@@ -12,45 +12,88 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css">
 
-    <!-- jQuery and DataTables -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/rowgroup/1.4.1/js/dataTables.rowGroup.min.js"></script>
-
-    <!-- Marked for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- Mermaid for diagrams -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- DataTables RowGroup JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.2.0/js/dataTables.rowGroup.min.js"></script>
+    
+    <!-- Markdown, Sanitization, and Mermaid for description rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
     <style>
-        * {
-            box-sizing: border-box;
+        /* Theme variables */
+        :root {
+            --bg: #f5f5f5;
+            --text: #2c3e50;
+            --table-bg: #ffffff;
+            --table-text: #2c3e50;
+            --group-header-bg: #eceff1;
+            --group-header-text: #2c3e50;
+            --link: #1e88e5;
+            --muted: #cfd8dc;
         }
-
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121212;
+                --text: #e0e0e0;
+                --table-bg: #1e1e1e;
+                --table-text: #e0e0e0;
+                --group-header-bg: #222222;
+                --group-header-text: #e0e0e0;
+                --link: #90caf9;
+                --muted: #424242;
+            }
+        }
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --text: #2c3e50;
+            --table-bg: #ffffff;
+            --table-text: #2c3e50;
+            --group-header-bg: #eceff1;
+            --group-header-text: #2c3e50;
+            --link: #1e88e5;
+            --muted: #cfd8dc;
+        }
+        [data-theme="dark"] {
+            --bg: #121212;
+            --text: #e0e0e0;
+            --table-bg: #1e1e1e;
+            --table-text: #e0e0e0;
+            --group-header-bg: #222222;
+            --group-header-text: #e0e0e0;
+            --link: #90caf9;
+            --muted: #424242;
+        }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
-            color: #1e293b;
+            overflow: auto; /* Updated from 'hidden' to 'auto' */
+            position: relative;
+            background-color: var(--bg);
+            color: var(--text);
         }
 
-        .container {
-            max-width: 1400px;
+        h1 {
+            text-align: center;
+            margin-bottom: 2em;
+            z-index: 1;
+            position: relative;
+            cursor: pointer; /* Indicate that the header can be interacted with */
+        }
+
+        #ingressTable {
+            background-color: var(--table-bg);
+            color: var(--table-text);
+            z-index: 1;
+            position: relative;
+            width: 80%;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Header Section */
-        .header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
+        /* previously used for Three.js background; removed */
 
         .header-content {
             max-width: 1400px;
@@ -390,15 +433,83 @@
         .hidden {
             display: none !important;
         }
+        tr.group td {
+            background-color: var(--group-header-bg) !important;
+            color: var(--group-header-text) !important;
+        }
+
+        /* Description block below the title */
+        #descriptionContainer {
+            width: 80%;
+            margin: 0.5em auto 1.5em auto;
+            color: #34495e;
+            line-height: 1.4;
+        }
+        #descriptionContainer .desc-content {
+            display: block;
+        }
+        #descriptionContainer.collapsed .desc-content {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        #descToggle {
+            background: none;
+            border: none;
+            color: var(--link);
+            cursor: pointer;
+            padding: 0;
+            margin-top: 0.25em;
+            font-size: 0.95em;
+        }
+
+        a { color: var(--link); }
+        .external-icon {
+            width: 0.95em;
+            height: 0.95em;
+            margin-left: 0.25em;
+            vertical-align: -0.1em;
+        }
+
+        /* Theme toggle button */
+        #themeToggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            border: 1px solid var(--muted);
+            background: var(--table-bg);
+            color: var(--text);
+            cursor: pointer;
+            z-index: 10;
+        }
+        #themeToggle svg { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
 
+<<<<<<< HEAD
 <div class="header">
     <div class="header-content">
         <h1 id="pageTitle">Ingress Browser</h1>
         <p class="subtitle" id="pageSubtitle">Kubernetes Ingress Management</p>
     </div>
+=======
+<h1 id="domainName">Ingress Browser</h1>
+<button id="themeToggle" aria-label="Toggle theme" title="Theme: Auto"></button>
+<div id="descriptionContainer" class="collapsed" style="display:none;">
+    <span class="desc-content" id="descContent"></span>
+    <div>
+        <button id="descToggle" type="button">Show more</button>
+    </div>
+    
+>>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
 </div>
 
 <div class="container">
@@ -432,6 +543,7 @@
 </div>
 
 <script>
+<<<<<<< HEAD
     // Initialize mermaid with specific configuration
     mermaid.initialize({
         startOnLoad: false,
@@ -447,6 +559,247 @@
     // Custom markdown renderer that handles mermaid
     async function renderMarkdownWithMermaid(markdown) {
         if (!markdown) return '';
+=======
+    // Theme helpers
+    (function(){
+        var sunSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+        var moonSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        var autoSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2" ry="2"></rect><line x1="8" y1="20" x2="16" y2="20"></line></svg>';
+
+        function applyTheme(mode){
+            var root = document.documentElement;
+            if (mode === 'light') {
+                root.setAttribute('data-theme', 'light');
+            } else if (mode === 'dark') {
+                root.setAttribute('data-theme', 'dark');
+            } else {
+                root.removeAttribute('data-theme'); // auto, follow system
+            }
+            localStorage.setItem('theme-mode', mode);
+            updateThemeButton(mode);
+        }
+
+        function updateThemeButton(mode){
+            var btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            if (mode === 'light') { btn.innerHTML = sunSVG; btn.title = 'Theme: Light'; }
+            else if (mode === 'dark') { btn.innerHTML = moonSVG; btn.title = 'Theme: Dark'; }
+            else { btn.innerHTML = autoSVG; btn.title = 'Theme: Auto'; }
+        }
+
+        function nextMode(current){
+            if (current === 'auto') return 'light';
+            if (current === 'light') return 'dark';
+            return 'auto';
+        }
+
+        window.__initTheme = function(){
+            var saved = localStorage.getItem('theme-mode') || 'auto';
+            applyTheme(saved);
+            var btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    var current = localStorage.getItem('theme-mode') || 'auto';
+                    applyTheme(nextMode(current));
+                });
+            }
+            // If in auto mode, we rely on CSS media queries; no JS listener required
+        };
+    })();
+
+    // Helpers to render Markdown + Mermaid safely into the description
+    // Debug helpers for description + mermaid
+    window.__lastDescriptionDebug = null;
+    window.debugDescription = function(){
+        if (!window.__lastDescriptionDebug) {
+            console.warn('No description has been rendered yet.');
+            return null;
+        }
+        var dbg = window.__lastDescriptionDebug;
+        try {
+            console.group('Description Debug');
+            console.log('Raw Markdown:', dbg.raw);
+            console.log('Normalized Markdown:', dbg.normalized);
+            console.log('Mermaid blocks (from Markdown):', dbg.mermaidBlocksMarkdown);
+            console.log('Generated HTML (pre-sanitize):', dbg.html);
+            console.log('Sanitized HTML (inserted):', dbg.safeHtml);
+            console.log('Mermaid blocks (from DOM):', dbg.mermaidBlocksDom);
+            console.log('Mermaid nodes count:', (dbg.mermaidBlocksDom || []).length);
+            console.log('Mermaid version:', dbg.mermaidVersion || '(unknown)');
+            if (dbg.mermaidRenderError) console.error('Mermaid render error:', dbg.mermaidRenderError);
+            console.groupEnd();
+        } catch(e) {
+            console.log(dbg);
+        }
+        return dbg;
+    };
+
+    function extractMermaidBlocksFromMarkdown(md){
+        var blocks = [];
+        try {
+            var re = /```mermaid\s*([\s\S]*?)```/gi;
+            var m;
+            while ((m = re.exec(md)) !== null) {
+                blocks.push((m[1] || '').trim());
+            }
+        } catch(e) { /* ignore */ }
+        return blocks;
+    }
+
+    function renderDescription(markdownText) {
+        try {
+            if (!markdownText) return;
+            // Normalize newlines to help Markdown/Mermaid parsing
+            if (typeof markdownText === 'string') {
+                var __raw = String(markdownText);
+                markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
+            }
+            // Configure marked with custom renderer for mermaid blocks
+            if (window.marked) {
+                const renderer = new marked.Renderer();
+                const origCode = renderer.code.bind(renderer);
+                renderer.code = function(code, infostring, escaped) {
+                    const lang = (infostring || '').trim().toLowerCase();
+                    if (lang === 'mermaid') {
+                        // Wrap mermaid code blocks so mermaid.js can render them
+                        return '<div class="mermaid">' + code + '</div>';
+                    }
+                    return origCode(code, infostring, escaped);
+                };
+
+                const html = marked.parse(markdownText, { renderer, gfm: true, breaks: true });
+                const safeHtml = window.DOMPurify
+                    ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true, svg: true } })
+                    : html;
+                $('#descContent').html(safeHtml);
+                // Capture debug info after HTML insertion
+                var domBlocks = Array.prototype.map.call(
+                    document.querySelectorAll('#descContent .mermaid'),
+                    function(n){ return n.textContent; }
+                );
+                window.__lastDescriptionDebug = {
+                    raw: __raw || markdownText,
+                    normalized: markdownText,
+                    html: html,
+                    safeHtml: safeHtml,
+                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
+                    mermaidBlocksDom: domBlocks,
+                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
+                };
+            } else {
+                // Fallback: basic escaping and newline handling
+                var escapeHtml = function(s){
+                    return String(s)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                };
+                var fallbackHtml = escapeHtml(markdownText).replace(/\n/g, '<br>');
+                $('#descContent').html(fallbackHtml);
+                window.__lastDescriptionDebug = {
+                    raw: __raw || markdownText,
+                    normalized: markdownText,
+                    html: fallbackHtml,
+                    safeHtml: fallbackHtml,
+                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
+                    mermaidBlocksDom: [],
+                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
+                };
+            }
+
+            // Render mermaid diagrams if library is available
+            if (window.mermaid) {
+                try {
+                    if (!renderDescription._mermaidInit) {
+                        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+                        renderDescription._mermaidInit = true;
+                    }
+                    // Prefer run (v10+), fallback to init
+                    var mermaidNodes = document.querySelectorAll('#descContent .mermaid');
+                    if (mermaidNodes && mermaidNodes.length) {
+                        if (typeof mermaid.run === 'function') {
+                            mermaid.run({ nodes: mermaidNodes })
+                                .then(function(){ setupDescriptionToggle(); })
+                                .catch(function(err){
+                                    if (window.__lastDescriptionDebug) {
+                                        window.__lastDescriptionDebug.mermaidRenderError = (err && (err.message || String(err))) || 'Unknown error';
+                                    }
+                                    setupDescriptionToggle();
+                                });
+                            return; // toggle will be handled after render
+                        } else if (typeof mermaid.init === 'function') {
+                            mermaid.init(undefined, mermaidNodes);
+                        }
+                    }
+                } catch (e) { /* ignore mermaid errors */ }
+            }
+
+            // If mermaid not used or finished, set up toggle now
+            setupDescriptionToggle();
+        } catch (e) {
+            // Graceful fallback
+            $('#descContent').text(markdownText);
+            setupDescriptionToggle();
+        }
+    }
+
+    function setupDescriptionToggle() {
+        var $container = $('#descriptionContainer');
+        var $content = $('#descContent');
+        $container.show();
+        $container.addClass('collapsed');
+        setTimeout(function(){
+            var needsToggle = $content[0] && ($content[0].scrollHeight > $content[0].clientHeight + 1);
+            if (!needsToggle) {
+                $('#descToggle').hide();
+                $container.removeClass('collapsed');
+            } else {
+                $('#descToggle').show();
+            }
+        }, 0);
+
+        $('#descToggle').off('click').on('click', function(){
+            var isCollapsed = $container.hasClass('collapsed');
+            if (isCollapsed) {
+                $container.removeClass('collapsed');
+                $(this).text('Show less');
+            } else {
+                $container.addClass('collapsed');
+                $(this).text('Show more');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        // Initialize theme toggle
+        if (window.__initTheme) { window.__initTheme(); }
+        // Default header shows current host, override via config if provided
+        $("#domainName").text(window.location.hostname);
+        $.getJSON('/config.json')
+            .done(function(cfg){
+                if (cfg && cfg.title) {
+                    document.title = cfg.title;
+                    $("#domainName").text(cfg.title);
+                }
+                if (cfg && cfg.description) {
+                    renderDescription(cfg.description);
+                }
+            })
+            .fail(function(){ /* ignore if endpoint not available */ });
+
+        // Fetch data from the Node.js server
+        $.getJSON("/ingresses.json", function(data) {
+            const formattedData = data.map(item => {
+                return {
+                    ...item,
+                    host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
+                };
+            });
+            const allowCollapse = formattedData.length >= 10; // Enable collapse only when 10+ ingresses
+            const smallDataset = !allowCollapse; // <10 entries
+>>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
 
         // Extract mermaid blocks and replace with placeholders
         const mermaidBlocks = [];
@@ -518,6 +871,7 @@
                     { data: 'namespace' },
                     { data: 'host' }
                 ],
+<<<<<<< HEAD
                 order: [[1, 'asc'], [0, 'asc']],
                 pageLength: 100,
                 lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, 'All']],
@@ -533,12 +887,36 @@
                     startRender: function(rows, group) {
                         return $('<tr/>')
                             .append('<td colspan="3">' + group + ' (' + rows.count() + ' routes)</td>')
+=======
+                order: [[1, 'asc'], [0, 'asc']], // Order by Namespace then Name
+                pageLength: smallDataset ? formattedData.length : 500,
+                paging: !smallDataset,
+                searching: !smallDataset,
+                info: !smallDataset,
+                lengthChange: !smallDataset,
+                rowGroup: {
+                    dataSrc: 'namespace',
+                    startRender: function ( rows, group ) {
+                        // Add a unique identifier for each group
+                        var $header = $('<tr/>')
+                            .append('<td colspan="3"><strong>' + group + ' (' + rows.count() + ')</strong></td>')
+>>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
                             .attr('data-group', group)
-                            .addClass('group collapsed');
+                            .addClass('group');
+
+                        if (allowCollapse) {
+                            $header.addClass('collapsed');
+                        } else {
+                            // Show expanded and disable pointer cursor
+                            $header.css('cursor', 'default');
+                        }
+
+                        return $header;
                     }
                 }
             });
 
+<<<<<<< HEAD
             // Collapse all groups by default
             $('tr.group').each(function() {
                 var groupName = $(this).data('group');
@@ -565,11 +943,20 @@
                     $(this).removeClass('collapsed').addClass('expanded');
                 } else {
                     table.rows().every(function() {
+=======
+            // Collapse all groups by default when allowed; otherwise, keep expanded
+            if (allowCollapse) {
+                $('tr.group').each(function() {
+                    var groupName = $(this).data('group');
+                    // Hide rows belonging to this group
+                    table.rows({ search: 'applied' }).every(function(rowIdx, tableLoop, rowLoop){
+>>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
                         var data = this.data();
                         if (data.namespace === groupName) {
                             $(this.node()).hide();
                         }
                     });
+<<<<<<< HEAD
                     $(this).removeClass('expanded').addClass('collapsed');
                 }
             });
@@ -579,6 +966,44 @@
             );
         });
     });
+=======
+                });
+            } else {
+                $('tr.group').removeClass('collapsed');
+            }
+
+            // Toggle group collapse on header click (only when allowed)
+            if (allowCollapse) {
+                $('#ingressTable tbody').on('click', 'tr.group', function () {
+                    var groupName = $(this).data('group');
+                    var isCollapsed = $(this).hasClass('collapsed');
+
+                    if(isCollapsed){
+                        // Expand: Show rows
+                        table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                            var data = this.data();
+                            if(data.namespace === groupName){
+                                $(this.node()).show();
+                            }
+                        });
+                        $(this).removeClass('collapsed');
+                    } else {
+                        // Collapse: Hide rows
+                        table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                            var data = this.data();
+                            if(data.namespace === groupName){
+                                $(this.node()).hide();
+                            }
+                        });
+                        $(this).addClass('collapsed');
+                    }
+                });
+            }
+        });
+    });
+
+    // Three.js background removed per request
+>>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
 </script>
 
 </body>

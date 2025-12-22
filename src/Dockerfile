@@ -1,5 +1,5 @@
-# Use a Node.js base image
-FROM node:14
+# Use a maintained Node.js base image (Debian-based)
+FROM node:20
 
 # Create app directory in the container
 WORKDIR /app
@@ -11,8 +11,10 @@ COPY package*.json ./
 # Install dependencies in the container
 RUN npm install
 
-# Install jq and other dependencies required by your script
-RUN apt-get update && apt-get install -y jq curl
+# Install jq and curl required by the script
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends jq curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the Node.js server script and other necessary files into the container
 COPY . .
