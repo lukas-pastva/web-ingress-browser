@@ -378,7 +378,6 @@
     function renderDescription(markdownText) {
         try {
             if (!markdownText) return;
-            console.log('[DEBUG 1] Raw markdownText:', markdownText);
             markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
 
             if (window.marked) {
@@ -396,20 +395,16 @@
                         code = codeOrObj;
                         lang = (infostring || '').trim().toLowerCase();
                     }
-                    console.log('[DEBUG 2] Code block - lang:', lang, 'code:', code);
                     if (lang === 'mermaid') {
-                        console.log('[DEBUG 3] Mermaid code before clean:', code);
                         return '<div class="mermaid">' + code + '</div>';
                     }
                     return origCode(codeOrObj, infostring, escaped);
                 };
 
                 const html = marked.parse(markdownText, { renderer, gfm: true, breaks: true });
-                console.log('[DEBUG 4] HTML after marked:', html);
                 const safeHtml = window.DOMPurify
                     ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true, svg: true } })
                     : html;
-                console.log('[DEBUG 5] HTML after DOMPurify:', safeHtml);
                 $('#descContent').html(safeHtml);
             } else {
                 var escapeHtml = function(s){
@@ -422,7 +417,6 @@
             }
 
             // Render mermaid diagrams
-            console.log('[DEBUG 6] window.mermaid:', !!window.mermaid, window.mermaid);
             if (window.mermaid) {
                 try {
                     if (!renderDescription._mermaidInit) {
@@ -430,10 +424,6 @@
                         renderDescription._mermaidInit = true;
                     }
                     var mermaidNodes = document.querySelectorAll('#descContent .mermaid');
-                    console.log('[DEBUG 7] Mermaid nodes found:', mermaidNodes.length);
-                    mermaidNodes.forEach(function(node, i) {
-                        console.log('[DEBUG 8] Node', i, 'textContent:', node.textContent);
-                    });
                     if (mermaidNodes && mermaidNodes.length) {
                         if (typeof mermaid.run === 'function') {
                             // Store original content for retry
@@ -443,26 +433,18 @@
                             });
 
                             mermaid.run({ nodes: mermaidNodes })
-                                .then(function(){
-                                    console.log('[DEBUG 9] Mermaid render SUCCESS');
-                                    setupDescriptionToggle();
-                                })
+                                .then(function(){ setupDescriptionToggle(); })
                                 .catch(function(err){
-                                    console.error('Mermaid error, retrying without edge labels:', err);
-                                    // Retry with simplified diagram (remove edge labels)
+                                    // Mermaid edge label layout bug - retry without labels
                                     mermaidNodes.forEach(function(node, i) {
                                         var simplified = originalContents[i]
                                             .replace(/-->\|[^|]*\|/g, '-->')
                                             .replace(/---\|[^|]*\|/g, '---');
                                         node.textContent = simplified;
                                         node.removeAttribute('data-processed');
-                                        console.log('[DEBUG 10] Simplified code:', simplified);
                                     });
                                     mermaid.run({ nodes: mermaidNodes })
-                                        .then(function(){
-                                            console.log('[DEBUG 11] Mermaid retry SUCCESS');
-                                            setupDescriptionToggle();
-                                        })
+                                        .then(function(){ setupDescriptionToggle(); })
                                         .catch(function(err2){
                                             console.error('Mermaid retry also failed:', err2);
                                             setupDescriptionToggle();
