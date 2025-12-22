@@ -14,9 +14,8 @@
 
     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
-    <!-- DataTables RowGroup JS -->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.2.0/js/dataTables.rowGroup.min.js"></script>
-    
+
     <!-- Markdown, Sanitization, and Mermaid for description rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
@@ -29,10 +28,11 @@
             --text: #2c3e50;
             --table-bg: #ffffff;
             --table-text: #2c3e50;
-            --group-header-bg: #eceff1;
-            --group-header-text: #2c3e50;
+            --group-header-bg: #1e3a5f;
+            --group-header-text: #ffffff;
             --link: #1e88e5;
             --muted: #cfd8dc;
+            --border: #e2e8f0;
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -40,10 +40,11 @@
                 --text: #e0e0e0;
                 --table-bg: #1e1e1e;
                 --table-text: #e0e0e0;
-                --group-header-bg: #222222;
-                --group-header-text: #e0e0e0;
+                --group-header-bg: #1e3a5f;
+                --group-header-text: #ffffff;
                 --link: #90caf9;
                 --muted: #424242;
+                --border: #333333;
             }
         }
         [data-theme="light"] {
@@ -51,399 +52,55 @@
             --text: #2c3e50;
             --table-bg: #ffffff;
             --table-text: #2c3e50;
-            --group-header-bg: #eceff1;
-            --group-header-text: #2c3e50;
+            --group-header-bg: #1e3a5f;
+            --group-header-text: #ffffff;
             --link: #1e88e5;
             --muted: #cfd8dc;
+            --border: #e2e8f0;
         }
         [data-theme="dark"] {
             --bg: #121212;
             --text: #e0e0e0;
             --table-bg: #1e1e1e;
             --table-text: #e0e0e0;
-            --group-header-bg: #222222;
-            --group-header-text: #e0e0e0;
+            --group-header-bg: #1e3a5f;
+            --group-header-text: #ffffff;
             --link: #90caf9;
             --muted: #424242;
+            --border: #333333;
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             margin: 0;
-            overflow: auto; /* Updated from 'hidden' to 'auto' */
+            overflow: auto;
             position: relative;
             background-color: var(--bg);
             color: var(--text);
+            min-height: 100vh;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 2em;
-            z-index: 1;
-            position: relative;
-            cursor: pointer; /* Indicate that the header can be interacted with */
-        }
-
-        #ingressTable {
-            background-color: var(--table-bg);
-            color: var(--table-text);
-            z-index: 1;
-            position: relative;
-            width: 80%;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* previously used for Three.js background; removed */
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .header h1 {
-            margin: 0;
+            margin: 1.5em 0 0.5em 0;
             font-size: 1.75rem;
             font-weight: 600;
-            letter-spacing: -0.025em;
         }
 
-        .header .subtitle {
-            margin-top: 0.5rem;
-            opacity: 0.8;
-            font-size: 0.875rem;
-            font-weight: 400;
-        }
-
-        /* Description Card */
-        .description-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .description-card h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #475569;
-            margin: 0 0 1rem 0;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .description-content {
-            font-size: 0.9375rem;
-            line-height: 1.7;
-            color: #334155;
-        }
-
-        .description-content h2,
-        .description-content h3 {
-            color: #1e293b;
-            margin-top: 1.25rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .description-content h2 {
-            font-size: 1.125rem;
-        }
-
-        .description-content h3 {
-            font-size: 1rem;
-        }
-
-        .description-content ul {
-            margin: 0.75rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .description-content li {
-            margin: 0.375rem 0;
-        }
-
-        .description-content code {
-            background: #f1f5f9;
-            padding: 0.125rem 0.375rem;
-            border-radius: 4px;
-            font-size: 0.875em;
-            color: #0f172a;
-        }
-
-        .description-content pre {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 1rem;
-            overflow-x: auto;
-        }
-
-        /* Mermaid diagrams */
-        .mermaid {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            text-align: center;
-        }
-
-        /* Table Card */
-        .table-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .table-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin: 0;
-        }
-
-        .stats-badge {
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 0.375rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.8125rem;
-            font-weight: 500;
-        }
-
-        /* DataTables Styling Override */
-        #ingressTable {
-            width: 100% !important;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        #ingressTable thead th {
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.875rem 1rem;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: left;
-        }
-
-        #ingressTable tbody td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.875rem;
-            vertical-align: middle;
-        }
-
-        #ingressTable tbody tr:hover {
-            background: #f8fafc;
-        }
-
-        #ingressTable tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Group row styling */
-        #ingressTable tbody tr.group {
-            background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        #ingressTable tbody tr.group:hover {
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a5f 100%);
-        }
-
-        #ingressTable tbody tr.group td {
-            color: white;
-            font-weight: 600;
-            font-size: 0.8125rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            padding: 0.625rem 1rem;
-            border-bottom: none;
-        }
-
-        #ingressTable tbody tr.group td::before {
-            content: '';
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-left: 5px solid white;
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
-            margin-right: 0.5rem;
-            transition: transform 0.2s ease;
-        }
-
-        #ingressTable tbody tr.group.expanded td::before {
-            transform: rotate(90deg);
-        }
-
-        /* Links */
-        #ingressTable a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.15s ease;
-        }
-
-        #ingressTable a:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
-        }
-
-        /* DataTables controls */
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 1rem;
-        }
-
-        .dataTables_wrapper .dataTables_length label,
-        .dataTables_wrapper .dataTables_filter label {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.875rem;
-            outline: none;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            width: 250px;
-        }
-
-        .dataTables_wrapper .dataTables_length select:focus,
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .dataTables_wrapper .dataTables_info {
-            font-size: 0.8125rem;
-            color: #64748b;
-            padding-top: 1rem;
-        }
-
-        .dataTables_wrapper .dataTables_paginate {
-            padding-top: 1rem;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 0.375rem 0.75rem;
-            margin: 0 0.125rem;
-            font-size: 0.8125rem;
-            color: #475569 !important;
-            background: white !important;
-            transition: all 0.15s ease;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: #f1f5f9 !important;
-            border-color: #cbd5e1;
-            color: #1e293b !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #2563eb !important;
-            border-color: #2563eb;
-            color: white !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Loading state */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            color: #64748b;
-        }
-
-        .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #e2e8f0;
-            border-top-color: #2563eb;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 0.75rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .header-content {
-                padding: 0 1rem;
-            }
-
-            .header h1 {
-                font-size: 1.25rem;
-            }
-
-            .table-header {
-                flex-direction: column;
-                gap: 0.75rem;
-                align-items: flex-start;
-            }
-
-            .dataTables_wrapper .dataTables_filter input {
-                width: 100%;
-            }
-        }
-
-        /* Hidden utility */
-        .hidden {
-            display: none !important;
-        }
-        tr.group td {
-            background-color: var(--group-header-bg) !important;
-            color: var(--group-header-text) !important;
-        }
-
-        /* Description block below the title */
+        /* Description block */
         #descriptionContainer {
             width: 80%;
-            margin: 0.5em auto 1.5em auto;
-            color: #34495e;
-            line-height: 1.4;
+            max-width: 1200px;
+            margin: 0 auto 1.5em auto;
+            background: var(--table-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            line-height: 1.6;
         }
         #descriptionContainer .desc-content {
             display: block;
@@ -460,16 +117,151 @@
             color: var(--link);
             cursor: pointer;
             padding: 0;
-            margin-top: 0.25em;
-            font-size: 0.95em;
+            margin-top: 0.5em;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        #descToggle:hover {
+            text-decoration: underline;
         }
 
-        a { color: var(--link); }
+        /* Mermaid diagrams */
+        .mermaid {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        /* Table container */
+        .table-container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto 2rem auto;
+            background: var(--table-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        #ingressTable {
+            background-color: var(--table-bg);
+            color: var(--table-text);
+            width: 100% !important;
+        }
+
+        #ingressTable thead th {
+            background: var(--bg);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.875rem 1rem;
+            border-bottom: 2px solid var(--border);
+            text-align: left;
+        }
+
+        #ingressTable tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        #ingressTable tbody tr:hover {
+            background: var(--bg);
+        }
+
+        /* Group row styling */
+        #ingressTable tbody tr.group {
+            background: var(--group-header-bg) !important;
+            cursor: pointer;
+        }
+
+        #ingressTable tbody tr.group:hover {
+            opacity: 0.9;
+        }
+
+        #ingressTable tbody tr.group td {
+            color: var(--group-header-text) !important;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            padding: 0.625rem 1rem;
+            border-bottom: none;
+        }
+
+        #ingressTable tbody tr.group td::before {
+            content: '';
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid var(--group-header-text);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            margin-right: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        #ingressTable tbody tr.group:not(.collapsed) td::before {
+            transform: rotate(90deg);
+        }
+
+        /* Links */
+        a { color: var(--link); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
         .external-icon {
-            width: 0.95em;
-            height: 0.95em;
+            width: 0.9em;
+            height: 0.9em;
             margin-left: 0.25em;
             vertical-align: -0.1em;
+        }
+
+        /* DataTables controls */
+        .dataTables_wrapper .dataTables_length label,
+        .dataTables_wrapper .dataTables_filter label {
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            background: var(--table-bg);
+            color: var(--text);
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            font-size: 0.8125rem;
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+            margin: 0 0.125rem;
+            font-size: 0.8125rem;
+            color: var(--text) !important;
+            background: var(--table-bg) !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--bg) !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--link) !important;
+            border-color: var(--link);
+            color: white !important;
         }
 
         /* Theme toggle button */
@@ -489,77 +281,53 @@
             cursor: pointer;
             z-index: 10;
         }
+        #themeToggle:hover {
+            background: var(--bg);
+        }
         #themeToggle svg { width: 20px; height: 20px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #descriptionContainer,
+            .table-container {
+                width: 95%;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-<<<<<<< HEAD
-<div class="header">
-    <div class="header-content">
-        <h1 id="pageTitle">Ingress Browser</h1>
-        <p class="subtitle" id="pageSubtitle">Kubernetes Ingress Management</p>
-    </div>
-=======
 <h1 id="domainName">Ingress Browser</h1>
 <button id="themeToggle" aria-label="Toggle theme" title="Theme: Auto"></button>
+
 <div id="descriptionContainer" class="collapsed" style="display:none;">
     <span class="desc-content" id="descContent"></span>
     <div>
         <button id="descToggle" type="button">Show more</button>
     </div>
-    
->>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
 </div>
 
-<div class="container">
-    <div id="descriptionSection" class="description-card hidden">
-        <h2>Overview</h2>
-        <div class="description-content" id="descriptionContent"></div>
-    </div>
-
-    <div class="table-card">
-        <div class="table-header">
-            <h2 class="table-title">Ingress Routes</h2>
-            <span class="stats-badge" id="ingressCount">Loading...</span>
-        </div>
-
-        <div id="loadingState" class="loading">
-            <div class="loading-spinner"></div>
-            <span>Loading ingress routes...</span>
-        </div>
-
-        <table id="ingressTable" class="display" style="display: none;">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Namespace</th>
-                <th>Host</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+<div class="table-container">
+    <table id="ingressTable" class="display">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Namespace</th>
+            <th>Host</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
 <script>
-<<<<<<< HEAD
-    // Initialize mermaid with specific configuration
-    mermaid.initialize({
-        startOnLoad: false,
-        theme: 'neutral',
-        securityLevel: 'loose',
-        flowchart: {
-            useMaxWidth: true,
-            htmlLabels: true,
-            curve: 'basis'
-        }
-    });
-
-    // Custom markdown renderer that handles mermaid
-    async function renderMarkdownWithMermaid(markdown) {
-        if (!markdown) return '';
-=======
     // Theme helpers
     (function(){
         var sunSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
@@ -573,7 +341,7 @@
             } else if (mode === 'dark') {
                 root.setAttribute('data-theme', 'dark');
             } else {
-                root.removeAttribute('data-theme'); // auto, follow system
+                root.removeAttribute('data-theme');
             }
             localStorage.setItem('theme-mode', mode);
             updateThemeButton(mode);
@@ -603,65 +371,21 @@
                     applyTheme(nextMode(current));
                 });
             }
-            // If in auto mode, we rely on CSS media queries; no JS listener required
         };
     })();
 
-    // Helpers to render Markdown + Mermaid safely into the description
-    // Debug helpers for description + mermaid
-    window.__lastDescriptionDebug = null;
-    window.debugDescription = function(){
-        if (!window.__lastDescriptionDebug) {
-            console.warn('No description has been rendered yet.');
-            return null;
-        }
-        var dbg = window.__lastDescriptionDebug;
-        try {
-            console.group('Description Debug');
-            console.log('Raw Markdown:', dbg.raw);
-            console.log('Normalized Markdown:', dbg.normalized);
-            console.log('Mermaid blocks (from Markdown):', dbg.mermaidBlocksMarkdown);
-            console.log('Generated HTML (pre-sanitize):', dbg.html);
-            console.log('Sanitized HTML (inserted):', dbg.safeHtml);
-            console.log('Mermaid blocks (from DOM):', dbg.mermaidBlocksDom);
-            console.log('Mermaid nodes count:', (dbg.mermaidBlocksDom || []).length);
-            console.log('Mermaid version:', dbg.mermaidVersion || '(unknown)');
-            if (dbg.mermaidRenderError) console.error('Mermaid render error:', dbg.mermaidRenderError);
-            console.groupEnd();
-        } catch(e) {
-            console.log(dbg);
-        }
-        return dbg;
-    };
-
-    function extractMermaidBlocksFromMarkdown(md){
-        var blocks = [];
-        try {
-            var re = /```mermaid\s*([\s\S]*?)```/gi;
-            var m;
-            while ((m = re.exec(md)) !== null) {
-                blocks.push((m[1] || '').trim());
-            }
-        } catch(e) { /* ignore */ }
-        return blocks;
-    }
-
+    // Render Markdown + Mermaid safely
     function renderDescription(markdownText) {
         try {
             if (!markdownText) return;
-            // Normalize newlines to help Markdown/Mermaid parsing
-            if (typeof markdownText === 'string') {
-                var __raw = String(markdownText);
-                markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
-            }
-            // Configure marked with custom renderer for mermaid blocks
+            markdownText = markdownText.replace(/\r\n?/g, '\n').trim();
+
             if (window.marked) {
                 const renderer = new marked.Renderer();
                 const origCode = renderer.code.bind(renderer);
                 renderer.code = function(code, infostring, escaped) {
                     const lang = (infostring || '').trim().toLowerCase();
                     if (lang === 'mermaid') {
-                        // Wrap mermaid code blocks so mermaid.js can render them
                         return '<div class="mermaid">' + code + '</div>';
                     }
                     return origCode(code, infostring, escaped);
@@ -672,74 +396,42 @@
                     ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true, svg: true } })
                     : html;
                 $('#descContent').html(safeHtml);
-                // Capture debug info after HTML insertion
-                var domBlocks = Array.prototype.map.call(
-                    document.querySelectorAll('#descContent .mermaid'),
-                    function(n){ return n.textContent; }
-                );
-                window.__lastDescriptionDebug = {
-                    raw: __raw || markdownText,
-                    normalized: markdownText,
-                    html: html,
-                    safeHtml: safeHtml,
-                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
-                    mermaidBlocksDom: domBlocks,
-                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
-                };
             } else {
-                // Fallback: basic escaping and newline handling
                 var escapeHtml = function(s){
                     return String(s)
                         .replace(/&/g, '&amp;')
                         .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#039;');
+                        .replace(/>/g, '&gt;');
                 };
-                var fallbackHtml = escapeHtml(markdownText).replace(/\n/g, '<br>');
-                $('#descContent').html(fallbackHtml);
-                window.__lastDescriptionDebug = {
-                    raw: __raw || markdownText,
-                    normalized: markdownText,
-                    html: fallbackHtml,
-                    safeHtml: fallbackHtml,
-                    mermaidBlocksMarkdown: extractMermaidBlocksFromMarkdown(__raw || markdownText),
-                    mermaidBlocksDom: [],
-                    mermaidVersion: (window.mermaid && (window.mermaid.version || (window.mermaid.mermaidAPI && window.mermaid.mermaidAPI.version))) || undefined
-                };
+                $('#descContent').html(escapeHtml(markdownText).replace(/\n/g, '<br>'));
             }
 
-            // Render mermaid diagrams if library is available
+            // Render mermaid diagrams
             if (window.mermaid) {
                 try {
                     if (!renderDescription._mermaidInit) {
-                        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+                        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral' });
                         renderDescription._mermaidInit = true;
                     }
-                    // Prefer run (v10+), fallback to init
                     var mermaidNodes = document.querySelectorAll('#descContent .mermaid');
                     if (mermaidNodes && mermaidNodes.length) {
                         if (typeof mermaid.run === 'function') {
                             mermaid.run({ nodes: mermaidNodes })
                                 .then(function(){ setupDescriptionToggle(); })
                                 .catch(function(err){
-                                    if (window.__lastDescriptionDebug) {
-                                        window.__lastDescriptionDebug.mermaidRenderError = (err && (err.message || String(err))) || 'Unknown error';
-                                    }
+                                    console.error('Mermaid error:', err);
                                     setupDescriptionToggle();
                                 });
-                            return; // toggle will be handled after render
+                            return;
                         } else if (typeof mermaid.init === 'function') {
                             mermaid.init(undefined, mermaidNodes);
                         }
                     }
-                } catch (e) { /* ignore mermaid errors */ }
+                } catch (e) { console.error('Mermaid init error:', e); }
             }
 
-            // If mermaid not used or finished, set up toggle now
             setupDescriptionToggle();
         } catch (e) {
-            // Graceful fallback
             $('#descContent').text(markdownText);
             setupDescriptionToggle();
         }
@@ -775,8 +467,11 @@
     $(document).ready(function() {
         // Initialize theme toggle
         if (window.__initTheme) { window.__initTheme(); }
-        // Default header shows current host, override via config if provided
+
+        // Default header shows current host
         $("#domainName").text(window.location.hostname);
+
+        // Load config
         $.getJSON('/config.json')
             .done(function(cfg){
                 if (cfg && cfg.title) {
@@ -787,108 +482,26 @@
                     renderDescription(cfg.description);
                 }
             })
-            .fail(function(){ /* ignore if endpoint not available */ });
-
-        // Fetch data from the Node.js server
-        $.getJSON("/ingresses.json", function(data) {
-            const formattedData = data.map(item => {
-                return {
-                    ...item,
-                    host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
-                };
-            });
-            const allowCollapse = formattedData.length >= 10; // Enable collapse only when 10+ ingresses
-            const smallDataset = !allowCollapse; // <10 entries
->>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
-
-        // Extract mermaid blocks and replace with placeholders
-        const mermaidBlocks = [];
-        let processedMarkdown = markdown.replace(/```mermaid\s*([\s\S]*?)```/g, (match, code) => {
-            const id = `mermaid-${mermaidBlocks.length}`;
-            mermaidBlocks.push({ id, code: code.trim() });
-            return `<div class="mermaid" id="${id}"></div>`;
-        });
-
-        // Parse markdown (without mermaid blocks)
-        const html = marked.parse(processedMarkdown);
-
-        return { html, mermaidBlocks };
-    }
-
-    $(document).ready(async function() {
-        // Load configuration
-        try {
-            const config = await $.getJSON('/config.json');
-
-            // Update title
-            if (config.pageTitle) {
-                $('#pageTitle').text(config.pageTitle);
-                document.title = config.pageTitle;
-            }
-
-            // Update description
-            if (config.pageDescription) {
-                const { html, mermaidBlocks } = await renderMarkdownWithMermaid(config.pageDescription);
-                $('#descriptionContent').html(html);
-                $('#descriptionSection').removeClass('hidden');
-
-                // Render mermaid diagrams
-                for (const block of mermaidBlocks) {
-                    try {
-                        const { svg } = await mermaid.render(block.id + '-svg', block.code);
-                        document.getElementById(block.id).innerHTML = svg;
-                    } catch (err) {
-                        console.error('Mermaid render error:', err);
-                        document.getElementById(block.id).innerHTML =
-                            '<pre style="color: #dc2626; text-align: left;">Diagram Error: ' +
-                            err.message + '</pre>';
-                    }
-                }
-            }
-        } catch (err) {
-            console.log('No config available or error loading config');
-        }
+            .fail(function(){ /* ignore */ });
 
         // Fetch ingress data
-        $.getJSON('/ingresses.json', function(data) {
-            $('#loadingState').hide();
-            $('#ingressTable').show();
-
+        $.getJSON("/ingresses.json", function(data) {
             const formattedData = data.map(item => ({
                 ...item,
-                host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener">${item.host}${item.path}</a>`
+                host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
             }));
 
-            // Update stats
-            const namespaces = [...new Set(data.map(d => d.namespace))];
-            $('#ingressCount').text(`${data.length} routes in ${namespaces.length} namespaces`);
+            const allowCollapse = formattedData.length >= 10;
+            const smallDataset = !allowCollapse;
 
-            // Initialize DataTable
-            var table = $('#ingressTable').DataTable({
+            var table = $("#ingressTable").DataTable({
                 data: formattedData,
                 columns: [
                     { data: 'name' },
                     { data: 'namespace' },
                     { data: 'host' }
                 ],
-<<<<<<< HEAD
                 order: [[1, 'asc'], [0, 'asc']],
-                pageLength: 100,
-                lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, 'All']],
-                language: {
-                    search: 'Filter:',
-                    lengthMenu: 'Show _MENU_ entries',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ routes',
-                    infoEmpty: 'No routes found',
-                    infoFiltered: '(filtered from _MAX_ total routes)'
-                },
-                rowGroup: {
-                    dataSrc: 'namespace',
-                    startRender: function(rows, group) {
-                        return $('<tr/>')
-                            .append('<td colspan="3">' + group + ' (' + rows.count() + ' routes)</td>')
-=======
-                order: [[1, 'asc'], [0, 'asc']], // Order by Namespace then Name
                 pageLength: smallDataset ? formattedData.length : 500,
                 paging: !smallDataset,
                 searching: !smallDataset,
@@ -896,114 +509,62 @@
                 lengthChange: !smallDataset,
                 rowGroup: {
                     dataSrc: 'namespace',
-                    startRender: function ( rows, group ) {
-                        // Add a unique identifier for each group
+                    startRender: function(rows, group) {
                         var $header = $('<tr/>')
                             .append('<td colspan="3"><strong>' + group + ' (' + rows.count() + ')</strong></td>')
->>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
                             .attr('data-group', group)
                             .addClass('group');
 
                         if (allowCollapse) {
                             $header.addClass('collapsed');
                         } else {
-                            // Show expanded and disable pointer cursor
                             $header.css('cursor', 'default');
                         }
-
                         return $header;
                     }
                 }
             });
 
-<<<<<<< HEAD
-            // Collapse all groups by default
-            $('tr.group').each(function() {
-                var groupName = $(this).data('group');
-                table.rows({ search: 'applied' }).every(function() {
-                    var data = this.data();
-                    if (data.namespace === groupName) {
-                        $(this.node()).hide();
-                    }
-                });
-            });
-
-            // Toggle group collapse on click
-            $('#ingressTable tbody').on('click', 'tr.group', function() {
-                var groupName = $(this).data('group');
-                var isCollapsed = $(this).hasClass('collapsed');
-
-                if (isCollapsed) {
-                    table.rows().every(function() {
-                        var data = this.data();
-                        if (data.namespace === groupName) {
-                            $(this.node()).show();
-                        }
-                    });
-                    $(this).removeClass('collapsed').addClass('expanded');
-                } else {
-                    table.rows().every(function() {
-=======
-            // Collapse all groups by default when allowed; otherwise, keep expanded
+            // Collapse groups by default when allowed
             if (allowCollapse) {
                 $('tr.group').each(function() {
                     var groupName = $(this).data('group');
-                    // Hide rows belonging to this group
-                    table.rows({ search: 'applied' }).every(function(rowIdx, tableLoop, rowLoop){
->>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
+                    table.rows({ search: 'applied' }).every(function(){
                         var data = this.data();
                         if (data.namespace === groupName) {
                             $(this.node()).hide();
                         }
                     });
-<<<<<<< HEAD
-                    $(this).removeClass('expanded').addClass('collapsed');
-                }
-            });
-        }).fail(function() {
-            $('#loadingState').html(
-                '<span style="color: #dc2626;">Failed to load ingress data. Please try again.</span>'
-            );
-        });
-    });
-=======
                 });
-            } else {
-                $('tr.group').removeClass('collapsed');
-            }
 
-            // Toggle group collapse on header click (only when allowed)
-            if (allowCollapse) {
-                $('#ingressTable tbody').on('click', 'tr.group', function () {
+                // Toggle collapse on click
+                $('#ingressTable tbody').on('click', 'tr.group', function() {
                     var groupName = $(this).data('group');
                     var isCollapsed = $(this).hasClass('collapsed');
 
-                    if(isCollapsed){
-                        // Expand: Show rows
-                        table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                    if (isCollapsed) {
+                        table.rows().every(function(){
                             var data = this.data();
-                            if(data.namespace === groupName){
+                            if (data.namespace === groupName) {
                                 $(this.node()).show();
                             }
                         });
                         $(this).removeClass('collapsed');
                     } else {
-                        // Collapse: Hide rows
-                        table.rows().every(function(rowIdx, tableLoop, rowLoop){
+                        table.rows().every(function(){
                             var data = this.data();
-                            if(data.namespace === groupName){
+                            if (data.namespace === groupName) {
                                 $(this.node()).hide();
                             }
                         });
                         $(this).addClass('collapsed');
                     }
                 });
+            } else {
+                $('tr.group').removeClass('collapsed');
             }
         });
     });
-
-    // Three.js background removed per request
->>>>>>> dffe1eb592b6eecc8706957714d5621a2862d95d
 </script>
 
 </body>

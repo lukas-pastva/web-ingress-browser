@@ -31,15 +31,6 @@ function generateIngressesJson(callback) {
     });
 }
 
-// Endpoint to serve configuration from environment variables
-app.get('/config.json', (req, res) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.json({
-        pageTitle: process.env.PAGE_TITLE || 'Ingress Browser',
-        pageDescription: process.env.PAGE_DESCRIPTION || ''
-    });
-});
-
 // Endpoint to serve ingresses.json
 app.get('/ingresses.json', (req, res) => {
     // Run the script each time a client requests /ingresses.json
