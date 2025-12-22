@@ -383,12 +383,22 @@
             if (window.marked) {
                 const renderer = new marked.Renderer();
                 const origCode = renderer.code.bind(renderer);
-                renderer.code = function(code, infostring, escaped) {
-                    const lang = (infostring || '').trim().toLowerCase();
+                // marked v4+ passes an object; v3 and earlier pass separate args
+                renderer.code = function(codeOrObj, infostring, escaped) {
+                    let code, lang;
+                    if (typeof codeOrObj === 'object' && codeOrObj !== null) {
+                        // marked v4+ object signature
+                        code = codeOrObj.text || codeOrObj.code || '';
+                        lang = (codeOrObj.lang || '').trim().toLowerCase();
+                    } else {
+                        // legacy signature
+                        code = codeOrObj;
+                        lang = (infostring || '').trim().toLowerCase();
+                    }
                     if (lang === 'mermaid') {
                         return '<div class="mermaid">' + code + '</div>';
                     }
-                    return origCode(code, infostring, escaped);
+                    return origCode(codeOrObj, infostring, escaped);
                 };
 
                 const html = marked.parse(markdownText, { renderer, gfm: true, breaks: true });
