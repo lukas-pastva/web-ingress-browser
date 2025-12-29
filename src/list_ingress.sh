@@ -17,7 +17,7 @@ if [ -n "$FILTER_PATTERN" ]; then
     JQ_FILTER="$JQ_FILTER | select(.metadata.name | test(\$pattern))"
 fi
 
-JQ_FILTER="$JQ_FILTER | {name: .metadata.name, namespace: .metadata.namespace, host: .spec.rules[].host, path: (.spec.rules[].http.paths[]?.path // \"/\") | gsub(\"\\\\(\\.\\.\\*\\\\)\"; \"\")}]"
+JQ_FILTER="$JQ_FILTER | {name: .metadata.name, namespace: .metadata.namespace, host: .spec.rules[].host, path: (.spec.rules[].http.paths[]?.path // \"/\") | gsub(\"\\\\(\\\\.\\\\*\\\\)\"; \"\")}]"
 
 # Execute the query with appropriate arguments
 curl -s --cacert $CA_CERT -H "Authorization: Bearer $TOKEN" $API_SERVER/apis/networking.k8s.io/v1/ingresses | \
