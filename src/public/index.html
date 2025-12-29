@@ -101,6 +101,12 @@
             border-radius: 8px;
             padding: 1.25rem 1.5rem;
             line-height: 1.6;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        #descriptionContainer.collapsed {
+            max-height: none;
+            overflow-y: visible;
         }
         #descriptionContainer .desc-content {
             display: block;
@@ -111,18 +117,26 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .desc-toggle-wrapper {
+            position: sticky;
+            top: 0;
+            background: var(--table-bg);
+            padding-bottom: 0.5em;
+            margin-bottom: 0.5em;
+            z-index: 1;
+        }
         #descToggle {
-            background: none;
-            border: none;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
             color: var(--link);
             cursor: pointer;
-            padding: 0;
-            margin-top: 0.5em;
-            font-size: 0.9em;
+            padding: 0.4em 0.8em;
+            font-size: 0.85em;
             font-weight: 500;
         }
         #descToggle:hover {
-            text-decoration: underline;
+            background: var(--border);
         }
 
         /* Mermaid diagrams */
@@ -308,10 +322,10 @@
 <button id="themeToggle" aria-label="Toggle theme" title="Theme: Auto"></button>
 
 <div id="descriptionContainer" class="collapsed" style="display:none;">
-    <span class="desc-content" id="descContent"></span>
-    <div>
+    <div class="desc-toggle-wrapper">
         <button id="descToggle" type="button">Show more</button>
     </div>
+    <span class="desc-content" id="descContent"></span>
 </div>
 
 <div class="table-container">
