@@ -9,7 +9,7 @@
 **Key Features:**
 
 - **Aggregated Ingress Routes**: Fetches all Ingress objects from your Kubernetes cluster, listing their hosts and paths.
-- **Filtering**: Optional filtering capability (via environment variables) to focus on specific ingress objects by name pattern.
+- **Filtering**: Optional filtering capability (via environment variables) to focus on specific ingress objects by name pattern or by namespace.
 - **Web UI**: Serves a simple, intuitive, and interactive web UI for browsing ingress routes.
 - **Open Source**: Fully open-sourced under the Apache 2.0 license. Use, modify, and distribute as needed.
 
@@ -131,7 +131,9 @@ spec:
           - containerPort: 8080
         env:
           - name: FILTER_PATTERN
-            value: "my-app" # optional
+            value: "my-app" # optional - filter by ingress name pattern
+          - name: FILTER_NAMESPACES
+            value: "default,production" # optional - filter by namespaces
 ---
 apiVersion: v1
 kind: Service
@@ -162,6 +164,8 @@ Configuration and Environment Variables
 ---------------------------------------
 
 *   **`FILTER_PATTERN`**: Optional. If set, the `list_ingress.sh` script filters ingresses by name using a regex-like pattern.
+
+*   **`FILTER_NAMESPACES`**: Optional. If set, the `list_ingress.sh` script filters ingresses to only include those from the specified namespaces. Use a comma-separated list of namespace names (e.g., `"default,production,staging"`).
 
 *   **`PAGE_TITLE`**: Optional. If set, the UI uses this value for the browser tab title and the main page header. Example:
 
