@@ -10,11 +10,9 @@
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css">
 
     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.2.0/js/dataTables.rowGroup.min.js"></script>
 
     <!-- Markdown, Sanitization, and Mermaid for description rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
@@ -29,8 +27,6 @@
             --text-muted: #64748b;
             --table-bg: #ffffff;
             --table-text: #1e293b;
-            --group-header-bg: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-            --group-header-text: #ffffff;
             --link: #3b82f6;
             --link-hover: #2563eb;
             --muted: #e2e8f0;
@@ -39,7 +35,6 @@
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --accent: #3b82f6;
             --accent-light: #dbeafe;
-            --success: #10b981;
             --hover-bg: #f1f5f9;
         }
         @media (prefers-color-scheme: dark) {
@@ -49,8 +44,6 @@
                 --text-muted: #94a3b8;
                 --table-bg: #1e293b;
                 --table-text: #e2e8f0;
-                --group-header-bg: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-                --group-header-text: #ffffff;
                 --link: #60a5fa;
                 --link-hover: #93c5fd;
                 --muted: #334155;
@@ -68,8 +61,6 @@
             --text-muted: #64748b;
             --table-bg: #ffffff;
             --table-text: #1e293b;
-            --group-header-bg: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-            --group-header-text: #ffffff;
             --link: #3b82f6;
             --link-hover: #2563eb;
             --muted: #e2e8f0;
@@ -86,8 +77,6 @@
             --text-muted: #94a3b8;
             --table-bg: #1e293b;
             --table-text: #e2e8f0;
-            --group-header-bg: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-            --group-header-text: #ffffff;
             --link: #60a5fa;
             --link-hover: #93c5fd;
             --muted: #334155;
@@ -290,49 +279,6 @@
 
         #ingressTable tbody tr:last-child td {
             border-bottom: none;
-        }
-
-        /* Group row styling */
-        #ingressTable tbody tr.group {
-            background: var(--group-header-bg) !important;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        #ingressTable tbody tr.group:hover {
-            filter: brightness(1.1);
-            transform: scale(1.002);
-        }
-
-        #ingressTable tbody tr.group td {
-            color: var(--group-header-text) !important;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.875rem 1.25rem;
-            border-bottom: none;
-        }
-
-        #ingressTable tbody tr.group td::before {
-            content: '';
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-left: 6px solid var(--group-header-text);
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            margin-right: 0.75rem;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #ingressTable tbody tr.group:not(.collapsed) td::before {
-            transform: rotate(90deg);
-        }
-
-        /* Row expand/collapse animation */
-        #ingressTable tbody tr:not(.group) {
-            animation: fadeIn 0.2s ease-out;
         }
 
         /* Links */
@@ -610,8 +556,7 @@
         <thead>
         <tr>
             <th>Name</th>
-            <th>Namespace</th>
-            <th>Host</th>
+            <th>URL</th>
         </tr>
         </thead>
         <tbody></tbody>
@@ -813,84 +758,27 @@
             $('#ingressTable').show();
             const formattedData = data.map(item => ({
                 ...item,
-                host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
+                url: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
             }));
 
-            const allowCollapse = formattedData.length >= 20;
-            const smallDataset = !allowCollapse;
+            const smallDataset = formattedData.length < 20;
 
             var table = $("#ingressTable").DataTable({
                 data: formattedData,
                 columns: [
                     { data: 'name' },
-                    { data: 'namespace' },
-                    { data: 'host' }
+                    { data: 'url' }
                 ],
-                order: [[1, 'asc'], [0, 'asc']],
-                pageLength: smallDataset ? formattedData.length : 500,
+                order: [[0, 'asc']],
+                pageLength: smallDataset ? formattedData.length : 50,
                 paging: !smallDataset,
                 searching: !smallDataset,
                 info: !smallDataset,
-                lengthChange: !smallDataset,
-                rowGroup: {
-                    dataSrc: 'namespace',
-                    startRender: function(rows, group) {
-                        var $header = $('<tr/>')
-                            .append('<td colspan="3"><strong>' + group + ' (' + rows.count() + ')</strong></td>')
-                            .attr('data-group', group)
-                            .addClass('group');
-
-                        if (allowCollapse) {
-                            $header.addClass('collapsed');
-                        } else {
-                            $header.css('cursor', 'default');
-                        }
-                        return $header;
-                    }
-                }
+                lengthChange: !smallDataset
             });
 
             // Add placeholder to search input
-            $('.dataTables_filter input').attr('placeholder', 'Search ingresses...');
-
-            // Collapse groups by default when allowed
-            if (allowCollapse) {
-                $('tr.group').each(function() {
-                    var groupName = $(this).data('group');
-                    table.rows({ search: 'applied' }).every(function(){
-                        var data = this.data();
-                        if (data.namespace === groupName) {
-                            $(this.node()).hide();
-                        }
-                    });
-                });
-
-                // Toggle collapse on click
-                $('#ingressTable tbody').on('click', 'tr.group', function() {
-                    var groupName = $(this).data('group');
-                    var isCollapsed = $(this).hasClass('collapsed');
-
-                    if (isCollapsed) {
-                        table.rows().every(function(){
-                            var data = this.data();
-                            if (data.namespace === groupName) {
-                                $(this.node()).show();
-                            }
-                        });
-                        $(this).removeClass('collapsed');
-                    } else {
-                        table.rows().every(function(){
-                            var data = this.data();
-                            if (data.namespace === groupName) {
-                                $(this.node()).hide();
-                            }
-                        });
-                        $(this).addClass('collapsed');
-                    }
-                });
-            } else {
-                $('tr.group').removeClass('collapsed');
-            }
+            $('.dataTables_filter input').attr('placeholder', 'Search...');
         });
     });
 </script>
