@@ -93,8 +93,8 @@
 
         /* Description block */
         #descriptionContainer {
-            width: 80%;
-            max-width: 1200px;
+            width: 95%;
+            max-width: 1800px;
             margin: 0 auto 1.5em auto;
             background: var(--table-bg);
             border: 1px solid var(--border);
@@ -151,8 +151,8 @@
 
         /* Table container */
         .table-container {
-            width: 80%;
-            max-width: 1200px;
+            width: 95%;
+            max-width: 1800px;
             margin: 0 auto 2rem auto;
             background: var(--table-bg);
             border: 1px solid var(--border);
@@ -240,6 +240,7 @@
         .dataTables_wrapper .dataTables_filter label {
             font-size: 0.875rem;
             color: var(--text);
+            white-space: nowrap;
         }
 
         .dataTables_wrapper .dataTables_length select,
@@ -533,7 +534,7 @@
                 host: `<a href="https://${item.host}${item.path}" target="_blank" rel="noopener noreferrer">${item.host}${item.path}<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/></svg></a>`
             }));
 
-            const allowCollapse = formattedData.length >= 10;
+            const allowCollapse = formattedData.length >= 20;
             const smallDataset = !allowCollapse;
 
             var table = $("#ingressTable").DataTable({
