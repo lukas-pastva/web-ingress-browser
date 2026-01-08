@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+COPY ./src/package*.json ./
 
 # Install dependencies in the container
 RUN npm install
@@ -17,7 +17,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the Node.js server script and other necessary files into the container
-COPY . .
+COPY ./src .
 
 # Set permissions for the shell script
 RUN chmod +x ./list_ingress.sh
